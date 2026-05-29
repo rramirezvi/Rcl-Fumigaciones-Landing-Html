@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rramirezvi.github.io/Rcl-Fumigaciones-Landing-Html/sitemap.xml
+Sitemap: https://rclfumigaciones.com/sitemap.xml
