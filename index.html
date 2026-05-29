@@ -933,6 +933,29 @@
             font-size: 13px;
         }
 
+        .form-status {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .form-status.is-success {
+            display: block;
+            background: rgba(37, 211, 102, .13);
+            color: #8ff0b3;
+            border: 1px solid rgba(37, 211, 102, .28);
+        }
+
+        .form-status.is-error {
+            display: block;
+            background: rgba(255, 31, 31, .12);
+            color: #ffb3b3;
+            border: 1px solid rgba(255, 31, 31, .28);
+        }
+
         .bot-field {
             position: absolute;
             left: -9999px;
@@ -1580,14 +1603,11 @@
                 </div>
 
                 <div class="contact-card">
-                    <form id="contact-form" action="https://formsubmit.co/servicios@rclfumigaciones.com" method="post">
-                        <input type="hidden" name="_subject" value="Nueva solicitud desde la página web RCL Fumigaciones">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_next" value="https://rramirezvi.github.io/Rcl-Fumigaciones-Landing-Html/#contacto">
-                        <input type="hidden" id="form-started-at" name="tiempo_en_formulario" value="">
+                    <form id="contact-form" action="contacto.php" method="post">
+                        <input type="hidden" id="form-elapsed-seconds" name="form_elapsed_seconds" value="">
                         <div class="bot-field" aria-hidden="true">
                             <label for="website">No completar este campo</label>
-                            <input type="text" id="website" name="_honey" tabindex="-1" autocomplete="off">
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                         </div>
                         <div class="field">
                             <label for="nombre">Nombre</label>
@@ -1616,6 +1636,7 @@
                         </div>
                         <p class="form-note">También puedes contactarnos directamente por WhatsApp para una atención más
                             rápida.</p>
+                        <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
                         <button type="submit" class="btn btn-primary">Enviar solicitud</button>
                     </form>
                 </div>
@@ -1665,11 +1686,10 @@
         const menuToggle = document.querySelector('.menu-toggle');
         const nav = document.querySelector('#main-nav');
         const contactForm = document.querySelector('#contact-form');
-        const formStartedAt = document.querySelector('#form-started-at');
+        const formElapsedSeconds = document.querySelector('#form-elapsed-seconds');
+        const formStatus = document.querySelector('#form-status');
         const revealItems = document.querySelectorAll('.section-title, .service-card, .about-image, .about-content, .why-card, .step, .cta-box, .contact-card');
         const formLoadTime = Date.now();
-
-        formStartedAt.value = String(formLoadTime);
 
         const syncHeader = () => {
             header.classList.toggle('is-scrolled', window.scrollY > 8);
@@ -1694,13 +1714,24 @@
 
         contactForm.addEventListener('submit', (event) => {
             const elapsedSeconds = Math.round((Date.now() - formLoadTime) / 1000);
-            formStartedAt.value = `${elapsedSeconds} segundos`;
+            formElapsedSeconds.value = String(elapsedSeconds);
 
             if (elapsedSeconds < 4) {
                 event.preventDefault();
+                formStatus.textContent = 'Espera unos segundos antes de enviar el formulario.';
+                formStatus.className = 'form-status is-error';
                 return;
             }
         });
+
+        const formResult = new URLSearchParams(window.location.search).get('form');
+        if (formResult === 'ok') {
+            formStatus.textContent = 'Solicitud enviada correctamente. Te contactaremos pronto.';
+            formStatus.className = 'form-status is-success';
+        } else if (formResult === 'error') {
+            formStatus.textContent = 'No se pudo enviar la solicitud. Inténtalo nuevamente o escríbenos por WhatsApp.';
+            formStatus.className = 'form-status is-error';
+        }
 
         revealItems.forEach((item, index) => {
             item.classList.add('reveal');
